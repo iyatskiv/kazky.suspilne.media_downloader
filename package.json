@@ -1,0 +1,20 @@
+{
+  "name": "kazky.suspilne.media_downloader",
+  "version": "0.0.1",
+  "description": "Download all tales from kazky.suspilne.media",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "kazky",
+    "suspilne",
+    "download"
+  ],
+  "author": "Igor Yatskiv",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "node-id3": "^0.2.3"
+  }
+}
