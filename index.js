@@ -79,15 +79,6 @@ async function downloadFile(url, dest) {
 }
 
 async function downloadMedia({name, auth, image, song, url, id}) {
-  // {
-  //   "name": "ЗАЄЦЬ ХВАЛЬКО",
-  //   "auth": "АНДРІЙ ХЛИВНЮК, ВОКАЛІСТ ГУРТУ “БУМБОКС”",
-  //   "image": "tales/img/01-min.jpg",
-  //   "song": "tales/songs/01.mp3",
-  //   "url": "1",
-  //   "id": "1"
-  // }
-
   const imageUrl = [URL, image].join('/');
   const imageDest = path.join(DIR_TMP, name + '.jpg');
   const mp3Url = [URL, song].join('/');
@@ -104,19 +95,13 @@ async function downloadMedia({name, auth, image, song, url, id}) {
     title: name,
     artist: auth,
     image: {
-      mime: "jpeg",
+      mime: 'jpeg',
       type: {
         id: 3,
-        name: "front cover"
+        name: 'front cover'
       },
-      // description: String,
       imageBuffer: imageBuffer
-    },
-    // raw: {
-    //   TIT2: name,
-    //   TPE1: auth,
-    //   APIC: imageBuffer
-    // }
+    }
   };
 
   await NodeID3Promise.update(tags, mp3Dest);
@@ -210,17 +195,6 @@ try {
   }
 
   batch(jobs);
-
-  // batch([
-  //   downloadMedia.bind(null, list['1']),
-  //   downloadMedia.bind(null, list['2']),
-  //   downloadMedia.bind(null, list['3']),
-  //   downloadMedia.bind(null, list['4']),
-  //   downloadMedia.bind(null, list['5']),
-  //   downloadMedia.bind(null, list['6']),
-  //   downloadMedia.bind(null, list['7']),
-  //   downloadMedia.bind(null, list['8'])
-  // ]);
 } catch (e) {
   debugger;
 }
