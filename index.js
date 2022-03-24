@@ -4,12 +4,14 @@ import * as path from 'path';
 import * as https from 'https';
 import {fileURLToPath} from 'url';
 import {Promise as NodeID3Promise} from 'node-id3';
+import sharp from 'sharp';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const URL = 'https://kazky.suspilne.media';
 const DIR_MEDIA_NAME = 'media';
 const DIR_MEDIA = path.join(__dirname, DIR_MEDIA_NAME);
 const DIR_TMP = path.join(__dirname, 'tmp');
+const ALBUM_NAME = 'UA:Казки';
 
 async function fetchList() {
   return new Promise((resolve, reject) => {
@@ -61,11 +63,7 @@ async function downloadFile(url, dest) {
     https.get(url, response => {
       response.pipe(file);
 
-      file.on('finish', () => {
-        file.close(() => {
-          resolve();
-        });
-      });
+      file.on('finish', file.close.bind(file, resolve));
     }).on('error', error => {
       fs.unlink(dest, error => {
         if (error) {
@@ -81,15 +79,30 @@ async function downloadFile(url, dest) {
 async function downloadMedia({name, auth, image, song, url, id}) {
   const imageUrl = [URL, image].join('/');
   const imageDest = path.join(DIR_TMP, name + '.jpg');
+  const imageResizedDest = path.join(DIR_TMP, name + '_scaled.jpg');
   const mp3Url = [URL, song].join('/');
   const mp3Dest = path.join(DIR_MEDIA, name + '.mp3');
 
-  console.log('Downloading: ' + name);
+  console.log('Downloading: ' + url + ' - ' + name);
 
   await downloadFile(imageUrl, imageDest);
   await downloadFile(mp3Url, mp3Dest);
 
-  const imageBuffer = await readFile(imageDest);
+  const imageBuffer = await sharp(imageDest)
+  // await sharp(imageDest)
+    .resize(300, 300, {
+      kernel: sharp.kernel.lanczos3,
+      fit: 'cover'
+    })
+    .jpeg({
+      quality: 100,
+      progressive: false,
+      force: true
+    })
+    // .toFile(imageResizedDest);
+    .toBuffer();
+
+  // const imageBuffer = await readFile(imageResizedDest);
 
   const tags = {
     title: name,
@@ -98,10 +111,15 @@ async function downloadMedia({name, auth, image, song, url, id}) {
       mime: 'jpeg',
       type: {
         id: 3,
-        name: 'front cover'
+        name: 'Front Cover'
       },
       imageBuffer: imageBuffer
-    }
+    },
+    album: ALBUM_NAME,
+    copyright: 'UA:Казки, проект Суспільного Мовлення',
+    copyrightUrl: 'https://kazky.suspilne.media/',
+    language: 'ukr',
+    trackNumber: Number(url),
   };
 
   await NodeID3Promise.update(tags, mp3Dest);

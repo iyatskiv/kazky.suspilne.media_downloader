@@ -15,6 +15,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "node-id3": "^0.2.3"
+    "node-id3": "^0.2.3",
+    "sharp": "^0.30.3"
   }
 }
